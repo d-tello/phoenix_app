@@ -101,4 +101,24 @@ defmodule PhoenixApp.Collections do
   def change_log(%Log{} = log, attrs \\ %{}) do
     Log.changeset(log, attrs)
   end
+
+  @doc """
+  Returns the logs statistics grouped by slug within a date range.
+  """
+  def list_logs_stats(fromDateTime, toDateTime, rowsPerPage) do
+    query =
+      from l in Log,
+        where: l.inserted_at >= ^fromDateTime and l.inserted_at <= ^toDateTime,
+        limit: ^rowsPerPage,
+        select: %{
+          id: l.id,
+          slug: l.slug,
+          ref_url: l.ref_url,
+          segments: l.segments,
+          audiences: l.audiences,
+          pet_type: l.pet_type
+        }
+
+    Repo.all(query)
+  end
 end

@@ -7,10 +7,29 @@
   </:actions>
 </.header>
 
+<div class="flex space-x-4 mb-4">
+  <div>
+    <label for="fromDate" class="block text-sm font-medium text-gray-700">From Date</label>
+    <input type="date" id="fromDate" name="fromDate" value={@fromDate} phx-change="update_dates" class="mt-1 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md" data-test="from-date-picker"/>
+  </div>
+  <div>
+    <label for="toDate" class="block text-sm font-medium text-gray-700">To Date</label>
+    <input type="date" id="toDate" name="toDate" value={@toDate} phx-change="update_dates" class="mt-1 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md" data-test="to-date-picker"/>
+  </div>
+  <div>
+    <label for="rowsPerPage" class="block text-sm font-medium text-gray-700">Rows per page</label>
+    <select id="rowsPerPage" name="rowsPerPage" phx-change="update_rows_per_page" class="mt-1 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md" data-test="rows-per-page-dropdown">
+      <option value="10" selected={@rowsPerPage == 10}>10</option>
+      <option value="50" selected={@rowsPerPage == 50}>50</option>
+      <option value="100" selected={@rowsPerPage == 100}>100</option>
+    </select>
+  </div>
+</div>
+
 <.table
   id="collections_logs"
   rows={@streams.collections_logs}
-  row_click={fn {_id, log} -> JS.navigate(~p"/collections_logs/#{log}") end}
+  row_click={fn {_id, log} -> JS.navigate(~p"/collections_logs/#{log.slug}") end}
 >
   <:col :let={{_id, log}} label="Ref url"><%= log.ref_url %></:col>
   <:col :let={{_id, log}} label="Slug"><%= log.slug %></:col>
@@ -19,9 +38,9 @@
   <:col :let={{_id, log}} label="Pet type"><%= log.pet_type %></:col>
   <:action :let={{_id, log}}>
     <div class="sr-only">
-      <.link navigate={~p"/collections_logs/#{log}"}>Show</.link>
+      <.link navigate={~p"/collections_logs/#{log.slug}"}>Show</.link>
     </div>
-    <.link patch={~p"/collections_logs/#{log}/edit"}>Edit</.link>
+    <.link patch={~p"/collections_logs/#{log.slug}/edit"}>Edit</.link>
   </:action>
   <:action :let={{id, log}}>
     <.link

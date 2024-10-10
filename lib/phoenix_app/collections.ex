@@ -105,20 +105,32 @@ defmodule PhoenixApp.Collections do
   @doc """
   Returns the logs statistics grouped by slug within a date range.
   """
-  def list_logs_stats(fromDateTime, toDateTime, rowsPerPage) do
-    query =
-      from l in Log,
-        where: l.inserted_at >= ^fromDateTime and l.inserted_at <= ^toDateTime,
-        limit: ^rowsPerPage,
-        select: %{
-          id: l.id,
-          slug: l.slug,
-          ref_url: l.ref_url,
-          segments: l.segments,
-          audiences: l.audiences,
-          pet_type: l.pet_type
-        }
+def list_logs_stats(fromDate, toDate, rowsPerPage) do
+  # Log the parameters
+  IO.inspect(fromDate, label: "From Date")
+  IO.inspect(toDate, label: "To Date")
+  IO.inspect(rowsPerPage, label: "Rows Per Page")
 
-    Repo.all(query)
+  from(l in Log,
+    where: l.inserted_at >= ^fromDate and l.inserted_at <= ^toDate,
+    limit: ^rowsPerPage,
+    select: %{
+      id: l.id,
+      slug: l.slug,
+      ref_url: l.ref_url,
+      segments: l.segments,
+      audiences: l.audiences,
+      pet_type: l.pet_type
+    }
+  )
+  |> Repo.all()
+end
+  @doc """
+  Gets a single log by its slug.
+  """
+  def get_log_by_slug!(slug) do
+    Log
+    |> where([l], l.slug == ^slug)
+    |> Repo.one!()
   end
 end

@@ -66,7 +66,9 @@ config :phoenix_app, PhoenixAppWeb.Endpoint,
 config :phoenix_app, dev_routes: true
 
 # Do not include metadata nor timestamps in development logs
-config :logger, :console, format: "[$level] $message\n"
+config :logger, :console,
+  format: "[$level] $message\n",
+  level: :info  # Ensures :info, :warn, and :error messages are logged
 
 # Set a higher stacktrace during development. Avoid configuring such
 # in production as building large stacktraces may be expensive.

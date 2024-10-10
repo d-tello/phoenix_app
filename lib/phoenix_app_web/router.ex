@@ -18,6 +18,13 @@ defmodule PhoenixAppWeb.Router do
     pipe_through :browser
 
     get "/", PageController, :home
+
+    live "/collections_logs", LogLive.Index, :index
+    live "/collections_logs/new", LogLive.Index, :new
+    live "/collections_logs/:id/edit", LogLive.Index, :edit
+
+    live "/collections_logs/:id", LogLive.Show, :show
+    live "/collections_logs/:id/show/edit", LogLive.Show, :edit
   end
 
   # Other scopes may use custom stacks.

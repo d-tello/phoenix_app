@@ -1,0 +1,45 @@
+<.header>
+  Listing Collections logs
+  <:actions>
+    <.link patch={~p"/collections_logs/new"}>
+      <.button>New Log</.button>
+    </.link>
+  </:actions>
+</.header>
+
+<.table
+  id="collections_logs"
+  rows={@streams.collections_logs}
+  row_click={fn {_id, log} -> JS.navigate(~p"/collections_logs/#{log}") end}
+>
+  <:col :let={{_id, log}} label="Ref url"><%= log.ref_url %></:col>
+  <:col :let={{_id, log}} label="Slug"><%= log.slug %></:col>
+  <:col :let={{_id, log}} label="Segments"><%= log.segments %></:col>
+  <:col :let={{_id, log}} label="Audiences"><%= log.audiences %></:col>
+  <:col :let={{_id, log}} label="Pet type"><%= log.pet_type %></:col>
+  <:action :let={{_id, log}}>
+    <div class="sr-only">
+      <.link navigate={~p"/collections_logs/#{log}"}>Show</.link>
+    </div>
+    <.link patch={~p"/collections_logs/#{log}/edit"}>Edit</.link>
+  </:action>
+  <:action :let={{id, log}}>
+    <.link
+      phx-click={JS.push("delete", value: %{id: log.id}) |> hide("##{id}")}
+      data-confirm="Are you sure?"
+    >
+      Delete
+    </.link>
+  </:action>
+</.table>
+
+<.modal :if={@live_action in [:new, :edit]} id="log-modal" show on_cancel={JS.patch(~p"/collections_logs")}>
+  <.live_component
+    module={PhoenixAppWeb.LogLive.FormComponent}
+    id={@log.id || :new}
+    title={@page_title}
+    action={@live_action}
+    log={@log}
+    patch={~p"/collections_logs"}
+  />
+</.modal>

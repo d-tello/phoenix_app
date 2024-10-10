@@ -17,7 +17,7 @@ defmodule PhoenixAppWeb.LogLive.Index do
 
     logsStats = Collections.list_logs_stats(fromDateTime, toDateTime, rowsPerPage)
     socket = stream_configure(socket, :collections_logs, dom_id: &(&1.slug))
-    socket = assign(socket, fromDate: fromDate, toDate: toDate, rowsPerPage: rowsPerPage, collections_logs: logsStats)
+    socket = assign(socket, fromDate: fromDate, toDate: toDate, rowsPerPage: rowsPerPage, collectionsLogs: logsStats)
     {:ok, stream(socket, :collections_logs, logsStats)}
   end
 
@@ -30,7 +30,7 @@ defmodule PhoenixAppWeb.LogLive.Index do
   defp apply_action(socket, :edit, %{"id" => id}) do
     socket
     |> assign(:page_title, "Edit Log")
-    |> assign(:log, Collections.get_log!(id))
+    |> assign(:log, Collections.get_log_by_slug!(id))
   end
 
   defp apply_action(socket, :new, _params) do
@@ -72,7 +72,8 @@ defmodule PhoenixAppWeb.LogLive.Index do
     toDateTime = Timex.parse!(toDate <> " 23:59:59", "{YYYY}-{0M}-{0D} {h24}:{m}:{s}") |> Timex.to_datetime()
 
     logsStats = Collections.list_logs_stats(fromDateTime, toDateTime, socket.assigns.rowsPerPage)
-    {:noreply, assign(socket, fromDate: fromDate, toDate: toDate, collections_logs: logsStats)}
+    Logger.info("Logs Stats: #{inspect(logsStats)}")
+    {:noreply, assign(socket, fromDate: fromDate, toDate: toDate, collectionsLogs: logsStats)}
   end
 
   @impl true
@@ -86,6 +87,7 @@ defmodule PhoenixAppWeb.LogLive.Index do
     toDateTime = Timex.parse!(socket.assigns.toDate <> " 23:59:59", "{YYYY}-{0M}-{0D} {h24}:{m}:{s}") |> Timex.to_datetime()
 
     logsStats = Collections.list_logs_stats(fromDateTime, toDateTime, rowsPerPage)
-    {:noreply, assign(socket, rowsPerPage: rowsPerPage, collections_logs: logsStats)}
+    Logger.info("Logs Stats: #{inspect(logsStats)}")
+    {:noreply, assign(socket, rowsPerPage: rowsPerPage, collectionsLogs: logsStats)}
   end
 end

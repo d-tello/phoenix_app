@@ -125,12 +125,4 @@ def list_logs_stats(fromDate, toDate, rowsPerPage) do
   )
   |> Repo.all()
 end
-  @doc """
-  Gets a single log by its slug.
-  """
-  def get_log_by_slug!(slug) do
-    Log
-    |> where([l], l.slug == ^slug)
-    |> Repo.one!()
-  end
 end

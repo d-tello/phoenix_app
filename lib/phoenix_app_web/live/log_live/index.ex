@@ -79,15 +79,13 @@ defmodule PhoenixAppWeb.LogLive.Index do
   @impl true
   def handle_event("update_rows_per_page", %{"rowsPerPage" => rowsPerPage}, socket) do
     rowsPerPage = String.to_integer(rowsPerPage)
-    Logger.info("Event triggered: update_rows_per_page")
-    Logger.info("Updating rows per page: rowsPerPage=#{rowsPerPage}")
 
     # Convert date strings to DateTime structs
     fromDateTime = Timex.parse!(socket.assigns.fromDate <> " 00:00:00", "{YYYY}-{0M}-{0D} {h24}:{m}:{s}") |> Timex.to_datetime()
     toDateTime = Timex.parse!(socket.assigns.toDate <> " 23:59:59", "{YYYY}-{0M}-{0D} {h24}:{m}:{s}") |> Timex.to_datetime()
 
     logsStats = Collections.list_logs_stats(fromDateTime, toDateTime, rowsPerPage)
-    Logger.info("Logs Stats: #{inspect(logsStats)}")
+
     {:noreply, assign(socket, rowsPerPage: rowsPerPage, collectionsLogs: logsStats)}
   end
 end

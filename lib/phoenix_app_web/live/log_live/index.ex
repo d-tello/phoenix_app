@@ -12,11 +12,23 @@ defmodule PhoenixAppWeb.LogLive.Index do
     rowsPerPage = 10
 
     # Convert date strings to DateTime structs
-    fromDateTime = Timex.parse!(fromDate <> " 00:00:00", "{YYYY}-{0M}-{0D} {h24}:{m}:{s}") |> Timex.to_datetime()
-    toDateTime = Timex.parse!(toDate <> " 23:59:59", "{YYYY}-{0M}-{0D} {h24}:{m}:{s}") |> Timex.to_datetime()
+    fromDateTime =
+      Timex.parse!(fromDate <> " 00:00:00", "{YYYY}-{0M}-{0D} {h24}:{m}:{s}")
+      |> Timex.to_datetime()
+
+    toDateTime =
+      Timex.parse!(toDate <> " 23:59:59", "{YYYY}-{0M}-{0D} {h24}:{m}:{s}") |> Timex.to_datetime()
 
     logsStats = Collections.list_logs_stats(fromDateTime, toDateTime, rowsPerPage)
-    socket = assign(socket, fromDate: fromDate, toDate: toDate, rowsPerPage: rowsPerPage, collectionsLogs: logsStats)
+
+    socket =
+      assign(socket,
+        fromDate: fromDate,
+        toDate: toDate,
+        rowsPerPage: rowsPerPage,
+        collectionsLogs: logsStats
+      )
+
     {:ok, stream(socket, :collections_logs, logsStats)}
   end
 
@@ -28,6 +40,7 @@ defmodule PhoenixAppWeb.LogLive.Index do
 
   defp apply_action(socket, :edit, %{"id" => id}) do
     log = Collections.get_log!(id)
+
     socket
     |> assign(:page_title, "Edit Log")
     |> assign(:log, log)
@@ -63,29 +76,29 @@ defmodule PhoenixAppWeb.LogLive.Index do
   end
 
   @impl true
-  def handle_event("update_dates", %{"fromDate" => fromDate, "toDate" => toDate}, socket) do
-    Logger.info("Event triggered: update_dates")
-    Logger.info("Updating dates: fromDate=#{fromDate}, toDate=#{toDate}")
-
-    # Convert date strings to DateTime structs
-    fromDateTime = Timex.parse!(fromDate <> " 00:00:00", "{YYYY}-{0M}-{0D} {h24}:{m}:{s}") |> Timex.to_datetime()
-    toDateTime = Timex.parse!(toDate <> " 23:59:59", "{YYYY}-{0M}-{0D} {h24}:{m}:{s}") |> Timex.to_datetime()
-
-    logsStats = Collections.list_logs_stats(fromDateTime, toDateTime, socket.assigns.rowsPerPage)
-    Logger.info("Logs Stats: #{inspect(logsStats)}")
-    {:noreply, assign(socket, fromDate: fromDate, toDate: toDate, collectionsLogs: logsStats)}
-  end
-
-  @impl true
-  def handle_event("update_rows_per_page", %{"rowsPerPage" => rowsPerPage}, socket) do
+  def handle_event(
+        "handle_form_change",
+        %{"fromDate" => fromDate, "toDate" => toDate, "rowsPerPage" => rowsPerPage},
+        socket
+      ) do
     rowsPerPage = String.to_integer(rowsPerPage)
 
     # Convert date strings to DateTime structs
-    fromDateTime = Timex.parse!(socket.assigns.fromDate <> " 00:00:00", "{YYYY}-{0M}-{0D} {h24}:{m}:{s}") |> Timex.to_datetime()
-    toDateTime = Timex.parse!(socket.assigns.toDate <> " 23:59:59", "{YYYY}-{0M}-{0D} {h24}:{m}:{s}") |> Timex.to_datetime()
+    fromDateTime =
+      Timex.parse!(fromDate <> " 00:00:00", "{YYYY}-{0M}-{0D} {h24}:{m}:{s}")
+      |> Timex.to_datetime()
+
+    toDateTime =
+      Timex.parse!(toDate <> " 23:59:59", "{YYYY}-{0M}-{0D} {h24}:{m}:{s}") |> Timex.to_datetime()
 
     logsStats = Collections.list_logs_stats(fromDateTime, toDateTime, rowsPerPage)
 
-    {:noreply, assign(socket, rowsPerPage: rowsPerPage, collectionsLogs: logsStats)}
+    {:noreply,
+     assign(socket,
+       fromDate: fromDate,
+       toDate: toDate,
+       rowsPerPage: rowsPerPage,
+       collectionsLogs: logsStats
+     )}
   end
 end
